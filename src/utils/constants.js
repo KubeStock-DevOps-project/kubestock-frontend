@@ -155,6 +155,6 @@ export const API = {
   // Gateway Health
   // ============================================
   gateway: {
-    health: () => `${API_GATEWAY_URL}/health`,
+    health: () => `${API_GATEWAY_URL}/api/gateway/health`,
   },
 };
