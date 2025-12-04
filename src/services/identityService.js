@@ -3,10 +3,8 @@
  * Handles user management via Asgardeo SCIM2 proxy
  * Only admins can use these endpoints
  */
-import { createApiClient } from "../utils/axios";
-import { SERVICES, API_ENDPOINTS } from "../utils/constants";
-
-const identityApi = createApiClient(SERVICES.IDENTITY);
+import apiClient from "../utils/axios";
+import { API } from "../utils/constants";
 
 export const identityService = {
   // ============================================
@@ -17,7 +15,7 @@ export const identityService = {
    * Get all suppliers (users in supplier group)
    */
   listSuppliers: async () => {
-    const response = await identityApi.get(API_ENDPOINTS.IDENTITY.SUPPLIERS);
+    const response = await apiClient.get(API.identity.suppliers());
     return response.data;
   },
 
@@ -26,7 +24,7 @@ export const identityService = {
    * @param {Object} supplierData - { email, firstName, lastName, phone }
    */
   createSupplier: async (supplierData) => {
-    const response = await identityApi.post(API_ENDPOINTS.IDENTITY.SUPPLIERS, supplierData);
+    const response = await apiClient.post(API.identity.suppliers(), supplierData);
     return response.data;
   },
 
@@ -38,7 +36,7 @@ export const identityService = {
    * Get all warehouse staff (users in warehouse_staff group)
    */
   listWarehouseStaff: async () => {
-    const response = await identityApi.get(API_ENDPOINTS.IDENTITY.STAFF);
+    const response = await apiClient.get(API.identity.staff());
     return response.data;
   },
 
@@ -47,7 +45,7 @@ export const identityService = {
    * @param {Object} staffData - { email, firstName, lastName, phone }
    */
   createWarehouseStaff: async (staffData) => {
-    const response = await identityApi.post(API_ENDPOINTS.IDENTITY.STAFF, staffData);
+    const response = await apiClient.post(API.identity.staff(), staffData);
     return response.data;
   },
 
@@ -59,7 +57,7 @@ export const identityService = {
    * Get user by ID
    */
   getUser: async (userId) => {
-    const response = await identityApi.get(`${API_ENDPOINTS.IDENTITY.USERS}/${userId}`);
+    const response = await apiClient.get(API.identity.userById(userId));
     return response.data;
   },
 
@@ -67,7 +65,7 @@ export const identityService = {
    * Delete a user (supplier or staff)
    */
   deleteUser: async (userId) => {
-    const response = await identityApi.delete(`${API_ENDPOINTS.IDENTITY.USERS}/${userId}`);
+    const response = await apiClient.delete(API.identity.userById(userId));
     return response.data;
   },
 
@@ -79,7 +77,7 @@ export const identityService = {
    * List all groups
    */
   listGroups: async () => {
-    const response = await identityApi.get(API_ENDPOINTS.IDENTITY.GROUPS);
+    const response = await apiClient.get(API.identity.groups());
     return response.data;
   },
 };

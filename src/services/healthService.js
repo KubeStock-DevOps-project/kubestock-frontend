@@ -1,12 +1,10 @@
-import axios from "axios";
-import { API_ENDPOINTS } from "../utils/constants";
+import apiClient from "../utils/axios";
+import { API } from "../utils/constants";
 
 export const healthService = {
   checkProductService: async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.PRODUCT.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(API.product.health(), { timeout: 5000 });
       return {
         status: "healthy",
         service: "Product Catalog Service",
@@ -23,9 +21,7 @@ export const healthService = {
 
   checkInventoryService: async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.INVENTORY.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(API.inventory.health(), { timeout: 5000 });
       return {
         status: "healthy",
         service: "Inventory Service",
@@ -42,9 +38,7 @@ export const healthService = {
 
   checkSupplierService: async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.SUPPLIER.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(API.supplier.health(), { timeout: 5000 });
       return {
         status: "healthy",
         service: "Supplier Service",
@@ -61,9 +55,7 @@ export const healthService = {
 
   checkOrderService: async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.ORDER.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(API.order.health(), { timeout: 5000 });
       return {
         status: "healthy",
         service: "Order Service",
@@ -80,9 +72,7 @@ export const healthService = {
 
   checkIdentityService: async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.IDENTITY.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(API.identity.health(), { timeout: 5000 });
       return {
         status: "healthy",
         service: "Identity Service",
@@ -98,10 +88,16 @@ export const healthService = {
   },
 
   checkGateway: async () => {
+    const healthUrl = API.gateway.health();
+    if (!healthUrl) {
+      return {
+        status: "skipped",
+        service: "API Gateway",
+        message: "Not available in development mode",
+      };
+    }
     try {
-      const response = await axios.get(API_ENDPOINTS.GATEWAY.HEALTH, {
-        timeout: 5000,
-      });
+      const response = await apiClient.get(healthUrl, { timeout: 5000 });
       return {
         status: "healthy",
         service: "API Gateway",

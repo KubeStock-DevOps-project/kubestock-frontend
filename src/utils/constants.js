@@ -1,85 +1,160 @@
-// API Endpoints with consistent service prefixes
-// Each service has a common prefix for simplified gateway routing:
-// - Product Service: /api/product/*
-// - Inventory Service: /api/inventory/*
-// - Supplier Service: /api/supplier/*
-// - Order Service: /api/order/*
-// - Identity Service: /api/identity/*
-//
-// Gateway strips the /api/{service} prefix before forwarding to backends
-// So frontend calls /api/product/health → gateway forwards /health to ms-product
+/**
+ * API Configuration
+ * 
+ * Architecture:
+ * - Development: Direct calls to microservices (http://localhost:300x/path)
+ * - Production: Calls through gateway with prefix (/api/service/path)
+ * 
+ * Usage:
+ *   import { API } from '../utils/constants';
+ *   axios.get(API.product.health());
+ *   axios.get(API.product.byId(123));
+ *   axios.get(API.inventory.alerts());
+ */
 
-export const API_ENDPOINTS = {
-  // Product Catalog Service - /api/product/*
-  PRODUCT: {
-    BASE: "/api/product",
-    CATEGORIES: "/api/product/categories",
-    PRICING: "/api/product/pricing",
-    LIFECYCLE: "/api/product/lifecycle",
-    HEALTH: "/api/product/health",
-  },
-
-  // Inventory Service - /api/inventory/*
-  INVENTORY: {
-    BASE: "/api/inventory",
-    ALERTS: "/api/inventory/alerts",
-    RESERVE: "/api/inventory/reserve",
-    RELEASE: "/api/inventory/release",
-    BULK_CHECK: "/api/inventory/bulk-check",
-    ANALYTICS: "/api/inventory/analytics",
-    HEALTH: "/api/inventory/health",
-  },
-
-  // Supplier Service - /api/supplier/*
-  SUPPLIER: {
-    BASE: "/api/supplier",
-    RATINGS: "/api/supplier/ratings",
-    PURCHASE_ORDERS: "/api/supplier/purchase-orders",
-    HEALTH: "/api/supplier/health",
-  },
-
-  // Order Service - /api/order/*
-  ORDER: {
-    BASE: "/api/order",
-    HEALTH: "/api/order/health",
-  },
-
-  // Identity Service - /api/identity/*
-  IDENTITY: {
-    BASE: "/api/identity",
-    SUPPLIERS: "/api/identity/suppliers",
-    STAFF: "/api/identity/staff",
-    USERS: "/api/identity/users",
-    GROUPS: "/api/identity/groups",
-    HEALTH: "/api/identity/health",
-  },
-
-  // Gateway health check
-  GATEWAY: {
-    HEALTH: "/health",
-  },
-};
-
-// Environment detection
 const isDevelopment = import.meta.env.MODE === 'development';
 
-// API Gateway URL for staging/production environments
-const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || '';
+// Service base URLs for development (direct to microservices)
+const DEV_SERVICES = {
+  product: import.meta.env.VITE_PRODUCT_SERVICE_URL || 'http://localhost:3002',
+  inventory: import.meta.env.VITE_INVENTORY_SERVICE_URL || 'http://localhost:3003',
+  supplier: import.meta.env.VITE_SUPPLIER_SERVICE_URL || 'http://localhost:3004',
+  order: import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:3005',
+  identity: import.meta.env.VITE_IDENTITY_SERVICE_URL || 'http://localhost:3006',
+};
 
-// In development: call each microservice directly
-// In staging/production: call through API gateway (services are at /api/*)
-export const SERVICES = isDevelopment ? {
-  PRODUCT: import.meta.env.VITE_PRODUCT_SERVICE_URL || "http://localhost:3002",
-  INVENTORY: import.meta.env.VITE_INVENTORY_SERVICE_URL || "http://localhost:3003",
-  SUPPLIER: import.meta.env.VITE_SUPPLIER_SERVICE_URL || "http://localhost:3004",
-  ORDER: import.meta.env.VITE_ORDER_SERVICE_URL || "http://localhost:3005",
-  IDENTITY: import.meta.env.VITE_IDENTITY_SERVICE_URL || "http://localhost:3006",
-} : {
-  // In production, all API calls go through the same gateway/proxy
-  // The frontend nginx proxies /api/* to the API gateway
-  PRODUCT: API_GATEWAY_URL,
-  INVENTORY: API_GATEWAY_URL,
-  SUPPLIER: API_GATEWAY_URL,
-  ORDER: API_GATEWAY_URL,
-  IDENTITY: API_GATEWAY_URL,
+// Gateway prefixes for production
+const GATEWAY_PREFIXES = {
+  product: '/api/product',
+  inventory: '/api/inventory',
+  supplier: '/api/supplier',
+  order: '/api/order',
+  identity: '/api/identity',
+};
+
+/**
+ * Build URL based on environment
+ * @param {string} service - Service name (product, inventory, etc.)
+ * @param {string} path - Path without leading slash
+ * @returns {string} Complete URL
+ */
+const buildUrl = (service, path = '') => {
+  if (isDevelopment) {
+    return `${DEV_SERVICES[service]}${path ? `/${path}` : ''}`;
+  }
+  return `${GATEWAY_PREFIXES[service]}${path ? `/${path}` : ''}`;
+};
+
+/**
+ * API endpoints for all microservices
+ * Each method returns the complete URL ready for axios
+ */
+export const API = {
+  // ============================================
+  // Product Catalog Service
+  // ============================================
+  product: {
+    health: () => buildUrl('product', 'health'),
+    metrics: () => buildUrl('product', 'metrics'),
+    // Products
+    base: () => buildUrl('product'),
+    byId: (id) => buildUrl('product', id),
+    bySku: (sku) => buildUrl('product', `sku/${sku}`),
+    batch: () => buildUrl('product', 'batch'),
+    search: () => buildUrl('product', 'search'),
+    // Categories
+    categories: () => buildUrl('product', 'categories'),
+    categoryById: (id) => buildUrl('product', `categories/${id}`),
+    // Pricing
+    pricing: () => buildUrl('product', 'pricing'),
+    calculatePrice: () => buildUrl('product', 'pricing/calculate'),
+    // Lifecycle
+    lifecycle: (state) => buildUrl('product', `lifecycle${state ? `/${state}` : ''}`),
+    pendingApprovals: () => buildUrl('product', 'lifecycle/pending-approvals'),
+    approve: (id) => buildUrl('product', `lifecycle/${id}/approve`),
+    reject: (id) => buildUrl('product', `lifecycle/${id}/reject`),
+  },
+
+  // ============================================
+  // Inventory Service
+  // ============================================
+  inventory: {
+    health: () => buildUrl('inventory', 'health'),
+    metrics: () => buildUrl('inventory', 'metrics'),
+    // Inventory
+    base: () => buildUrl('inventory'),
+    byId: (id) => buildUrl('inventory', id),
+    byProductId: (productId) => buildUrl('inventory', `product/${productId}`),
+    bySku: (sku) => buildUrl('inventory', `sku/${sku}`),
+    adjust: () => buildUrl('inventory', 'adjust'),
+    movements: () => buildUrl('inventory', 'movements'),
+    // Reservations
+    reserve: () => buildUrl('inventory', 'reserve'),
+    release: () => buildUrl('inventory', 'release'),
+    // Alerts
+    alerts: () => buildUrl('inventory', 'alerts'),
+    alertById: (id) => buildUrl('inventory', `alerts/${id}`),
+    acknowledgeAlert: (id) => buildUrl('inventory', `alerts/${id}/acknowledge`),
+    reorderSuggestions: () => buildUrl('inventory', 'alerts/reorder-suggestions'),
+    // Bulk & Analytics
+    bulkCheck: () => buildUrl('inventory', 'bulk-check'),
+    analytics: () => buildUrl('inventory', 'analytics'),
+  },
+
+  // ============================================
+  // Supplier Service
+  // ============================================
+  supplier: {
+    health: () => buildUrl('supplier', 'health'),
+    metrics: () => buildUrl('supplier', 'metrics'),
+    // Suppliers
+    base: () => buildUrl('supplier'),
+    byId: (id) => buildUrl('supplier', id),
+    myProfile: () => buildUrl('supplier', 'profile/me'),
+    // Purchase Orders
+    purchaseOrders: () => buildUrl('supplier', 'purchase-orders'),
+    purchaseOrderById: (id) => buildUrl('supplier', `purchase-orders/${id}`),
+    purchaseOrderStatus: (id) => buildUrl('supplier', `purchase-orders/${id}/status`),
+    purchaseOrderReceive: (id) => buildUrl('supplier', `purchase-orders/${id}/receive`),
+    supplierPending: (supplierId) => buildUrl('supplier', `purchase-orders/supplier/${supplierId}/pending`),
+    supplierResponse: (id) => buildUrl('supplier', `purchase-orders/${id}/supplier-response`),
+    // Ratings
+    ratings: (supplierId) => buildUrl('supplier', `ratings/${supplierId}`),
+  },
+
+  // ============================================
+  // Order Management Service
+  // ============================================
+  order: {
+    health: () => buildUrl('order', 'health'),
+    metrics: () => buildUrl('order', 'metrics'),
+    // Orders
+    base: () => buildUrl('order'),
+    byId: (id) => buildUrl('order', id),
+    status: (id) => buildUrl('order', `${id}/status`),
+    cancel: (id) => buildUrl('order', `${id}/cancel`),
+    items: (id) => buildUrl('order', `${id}/items`),
+    stats: () => buildUrl('order', 'stats'),
+  },
+
+  // ============================================
+  // Identity Service
+  // ============================================
+  identity: {
+    health: () => buildUrl('identity', 'health'),
+    metrics: () => buildUrl('identity', 'metrics'),
+    // Users
+    suppliers: () => buildUrl('identity', 'suppliers'),
+    staff: () => buildUrl('identity', 'staff'),
+    users: () => buildUrl('identity', 'users'),
+    userById: (id) => buildUrl('identity', `users/${id}`),
+    groups: () => buildUrl('identity', 'groups'),
+  },
+
+  // ============================================
+  // Gateway (only meaningful in production)
+  // ============================================
+  gateway: {
+    health: () => isDevelopment ? null : '/health',
+  },
 };
