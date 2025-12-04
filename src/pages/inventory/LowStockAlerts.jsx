@@ -6,10 +6,8 @@ import Badge from "../../components/common/Badge";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Table from "../../components/common/Table";
 import toast from "react-hot-toast";
-import { createApiClient } from "../../utils/axios";
-import { SERVICES } from "../../utils/constants";
-
-const inventoryApi = createApiClient(SERVICES.INVENTORY);
+import apiClient from "../../utils/axios";
+import { API } from "../../utils/constants";
 
 const LowStockAlerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -27,9 +25,9 @@ const LowStockAlerts = () => {
       setLoading(true);
 
       const [alertsRes, suggestionsRes, statsRes] = await Promise.all([
-        inventoryApi.get("/api/alerts?status=active"),
-        inventoryApi.get("/api/alerts/reorder-suggestions"),
-        inventoryApi.get("/api/alerts/stats"),
+        apiClient.get(API.inventory.alerts(), { params: { status: 'active' } }),
+        apiClient.get(API.inventory.reorderSuggestions()),
+        apiClient.get(API.inventory.alertStats()),
       ]);
 
       setAlerts(alertsRes.data.data || []);
@@ -45,7 +43,7 @@ const LowStockAlerts = () => {
 
   const handleCheckStock = async () => {
     try {
-      const response = await inventoryApi.post("/api/alerts/check");
+      const response = await apiClient.post(API.inventory.checkAlerts());
       toast.success(response.data.message);
       fetchData();
     } catch (error) {
@@ -56,7 +54,7 @@ const LowStockAlerts = () => {
 
   const handleResolveAlert = async (id) => {
     try {
-      await inventoryApi.patch(`/api/alerts/${id}/resolve`);
+      await apiClient.patch(API.inventory.resolveAlert(id));
       toast.success("Alert resolved successfully");
       fetchData();
     } catch (error) {

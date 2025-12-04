@@ -68,11 +68,18 @@ export const API = {
     // Pricing
     pricing: () => buildUrl('product', 'pricing'),
     calculatePrice: () => buildUrl('product', 'pricing/calculate'),
+    calculateBundle: () => buildUrl('product', 'pricing/calculate-bundle'),
     // Lifecycle
     lifecycle: (state) => buildUrl('product', `lifecycle${state ? `/${state}` : ''}`),
-    pendingApprovals: () => buildUrl('product', 'lifecycle/pending-approvals'),
+    lifecycleStats: () => buildUrl('product', 'lifecycle-stats'),
+    pendingApprovals: () => buildUrl('product', 'pending-approvals'),
     approve: (id) => buildUrl('product', `lifecycle/${id}/approve`),
     reject: (id) => buildUrl('product', `lifecycle/${id}/reject`),
+    transition: (id, action) => buildUrl('product', `${id}/${action}`),
+    lifecycleHistory: (id) => buildUrl('product', `${id}/lifecycle-history`),
+    // Ratings
+    myRatings: () => buildUrl('product', 'my-ratings'),
+    rateProduct: (id) => buildUrl('product', `${id}/rate`),
   },
 
   // ============================================
@@ -94,7 +101,10 @@ export const API = {
     // Alerts
     alerts: () => buildUrl('inventory', 'alerts'),
     alertById: (id) => buildUrl('inventory', `alerts/${id}`),
+    alertStats: () => buildUrl('inventory', 'alerts/stats'),
     acknowledgeAlert: (id) => buildUrl('inventory', `alerts/${id}/acknowledge`),
+    checkAlerts: () => buildUrl('inventory', 'alerts/check'),
+    resolveAlert: (id) => buildUrl('inventory', `alerts/${id}/resolve`),
     reorderSuggestions: () => buildUrl('inventory', 'alerts/reorder-suggestions'),
     // Bulk & Analytics
     bulkCheck: () => buildUrl('inventory', 'bulk-check'),
@@ -116,6 +126,8 @@ export const API = {
     purchaseOrderById: (id) => buildUrl('supplier', `purchase-orders/${id}`),
     purchaseOrderStatus: (id) => buildUrl('supplier', `purchase-orders/${id}/status`),
     purchaseOrderReceive: (id) => buildUrl('supplier', `purchase-orders/${id}/receive`),
+    purchaseOrderRespond: (id) => buildUrl('supplier', `purchase-orders/${id}/respond`),
+    purchaseOrderShip: (id) => buildUrl('supplier', `purchase-orders/${id}/ship`),
     supplierPending: (supplierId) => buildUrl('supplier', `purchase-orders/supplier/${supplierId}/pending`),
     supplierResponse: (id) => buildUrl('supplier', `purchase-orders/${id}/supplier-response`),
     // Ratings

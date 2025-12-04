@@ -7,10 +7,8 @@ import Badge from "../../components/common/Badge";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { useAuth } from "../../context/AsgardeoAuthContext";
 import { productService } from "../../services/productService";
-import { createApiClient } from "../../utils/axios";
-import { SERVICES } from "../../utils/constants";
-
-const productApi = createApiClient(SERVICES.PRODUCT);
+import apiClient from "../../utils/axios";
+import { API } from "../../utils/constants";
 
 const ProductLifecycleManagement = () => {
   const { user } = useAuth();
@@ -41,8 +39,8 @@ const ProductLifecycleManagement = () => {
     try {
       setLoading(true);
       const [statsRes, pendingRes, productsRes] = await Promise.all([
-        productApi.get("/api/products/lifecycle-stats"),
-        productApi.get("/api/products/pending-approvals"),
+        apiClient.get(API.product.lifecycleStats()),
+        apiClient.get(API.product.pendingApprovals()),
         productService.getAllProducts(),
       ]);
 
@@ -59,7 +57,7 @@ const ProductLifecycleManagement = () => {
   const handleCreateProduct = async (e) => {
     e.preventDefault();
     try {
-      await productApi.post("/api/products/lifecycle", {
+      await apiClient.post(API.product.lifecycle(), {
         ...formData,
         created_by: 1,
       });
@@ -81,7 +79,7 @@ const ProductLifecycleManagement = () => {
 
   const handleTransition = async (productId, action) => {
     try {
-      await productApi.post(`/api/products/${productId}/${action}`, {
+      await apiClient.post(API.product.transition(productId, action), {
         userId: 1,
         notes: `${action} action`,
       });
@@ -94,9 +92,7 @@ const ProductLifecycleManagement = () => {
 
   const viewHistory = async (product) => {
     try {
-      const res = await productApi.get(
-        `/api/products/${product.id}/lifecycle-history`
-      );
+      const res = await apiClient.get(API.product.lifecycleHistory(product.id));
       setHistory(res.data.data || []);
       setSelectedProduct(product);
       setShowHistoryModal(true);

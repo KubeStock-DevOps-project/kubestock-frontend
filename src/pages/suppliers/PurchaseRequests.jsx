@@ -6,12 +6,10 @@ import Input from "../../components/common/Input";
 import Badge from "../../components/common/Badge";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { supplierService } from "../../services/supplierService";
-import { createApiClient } from "../../utils/axios";
-import { SERVICES } from "../../utils/constants";
+import apiClient from "../../utils/axios";
+import { API } from "../../utils/constants";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AsgardeoAuthContext";
-
-const supplierApi = createApiClient(SERVICES.SUPPLIER);
 
 const PurchaseRequests = () => {
   const { user } = useAuth();
@@ -81,8 +79,8 @@ const PurchaseRequests = () => {
           : null,
       };
 
-      await supplierApi.patch(
-        `/api/purchase-orders/${selectedRequest.id}/respond`,
+      await apiClient.patch(
+        API.supplier.purchaseOrderRespond(selectedRequest.id),
         payload
       );
 
@@ -102,8 +100,8 @@ const PurchaseRequests = () => {
   const submitShipment = async (e) => {
     e.preventDefault();
     try {
-      await supplierApi.patch(
-        `/api/purchase-orders/${selectedRequest.id}/ship`,
+      await apiClient.patch(
+        API.supplier.purchaseOrderShip(selectedRequest.id),
         shipData
       );
 

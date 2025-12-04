@@ -5,11 +5,9 @@ import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { productService } from "../../services/productService";
-import { createApiClient } from "../../utils/axios";
-import { SERVICES } from "../../utils/constants";
+import apiClient from "../../utils/axios";
+import { API } from "../../utils/constants";
 import toast from "react-hot-toast";
-
-const productApi = createApiClient(SERVICES.PRODUCT);
 
 const ProductRatings = () => {
   const [products, setProducts] = useState([]);
@@ -27,7 +25,7 @@ const ProductRatings = () => {
       setLoading(true);
       const [productsRes, ratingsRes] = await Promise.all([
         productService.getAllProducts(),
-        productApi.get("/api/products/my-ratings"),
+        apiClient.get(API.product.myRatings()),
       ]);
 
       setProducts(productsRes.data || []);
@@ -43,8 +41,8 @@ const ProductRatings = () => {
   const handleRateProduct = async (e) => {
     e.preventDefault();
     try {
-      await productApi.post(
-        `/api/products/${ratingProduct.id}/rate`,
+      await apiClient.post(
+        API.product.rateProduct(ratingProduct.id),
         ratingData
       );
 

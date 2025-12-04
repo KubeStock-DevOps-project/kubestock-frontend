@@ -5,10 +5,8 @@ import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { productService } from "../../services/productService";
-import { createApiClient } from "../../utils/axios";
-import { SERVICES } from "../../utils/constants";
-
-const productApi = createApiClient(SERVICES.PRODUCT);
+import apiClient from "../../utils/axios";
+import { API } from "../../utils/constants";
 
 const PricingCalculator = () => {
   const [products, setProducts] = useState([]);
@@ -56,7 +54,7 @@ const PricingCalculator = () => {
 
     try {
       setLoading(true);
-      const res = await productApi.post("/api/pricing/calculate", {
+      const res = await apiClient.post(API.product.calculatePrice(), {
         productId: parseInt(calculator.productId),
         quantity: parseInt(calculator.quantity),
         customerId: calculator.customerId
@@ -81,7 +79,7 @@ const PricingCalculator = () => {
 
     try {
       setLoading(true);
-      const res = await productApi.post("/api/pricing/calculate-bundle", {
+      const res = await apiClient.post(API.product.calculateBundle(), {
         items: validItems.map((item) => ({
           productId: parseInt(item.productId),
           quantity: parseInt(item.quantity),
