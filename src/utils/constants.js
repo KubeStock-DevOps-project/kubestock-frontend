@@ -1,9 +1,8 @@
 /**
  * API Configuration
  * 
- * Architecture:
- * - Development: Direct calls to microservices (http://localhost:300x/path)
- * - Production: Calls through gateway with prefix (/api/service/path)
+ * All API calls go through the API Gateway.
+ * The gateway base URL can be configured via VITE_API_GATEWAY_URL environment variable.
  * 
  * Usage:
  *   import { API } from '../utils/constants';
@@ -12,19 +11,11 @@
  *   axios.get(API.inventory.alerts());
  */
 
-const isDevelopment = import.meta.env.MODE === 'development';
+// API Gateway base URL - defaults to relative path for same-origin deployment
+const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || '';
 
-// Service base URLs for development (direct to microservices)
-const DEV_SERVICES = {
-  product: import.meta.env.VITE_PRODUCT_SERVICE_URL || 'http://localhost:3002',
-  inventory: import.meta.env.VITE_INVENTORY_SERVICE_URL || 'http://localhost:3003',
-  supplier: import.meta.env.VITE_SUPPLIER_SERVICE_URL || 'http://localhost:3004',
-  order: import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:3005',
-  identity: import.meta.env.VITE_IDENTITY_SERVICE_URL || 'http://localhost:3006',
-};
-
-// Gateway prefixes for production
-const GATEWAY_PREFIXES = {
+// Service prefixes on the gateway
+const SERVICE_PREFIXES = {
   product: '/api/product',
   inventory: '/api/inventory',
   supplier: '/api/supplier',
@@ -33,16 +24,13 @@ const GATEWAY_PREFIXES = {
 };
 
 /**
- * Build URL based on environment
+ * Build URL for API Gateway
  * @param {string} service - Service name (product, inventory, etc.)
  * @param {string} path - Path without leading slash
  * @returns {string} Complete URL
  */
 const buildUrl = (service, path = '') => {
-  if (isDevelopment) {
-    return `${DEV_SERVICES[service]}${path ? `/${path}` : ''}`;
-  }
-  return `${GATEWAY_PREFIXES[service]}${path ? `/${path}` : ''}`;
+  return `${API_GATEWAY_URL}${SERVICE_PREFIXES[service]}${path ? `/${path}` : ''}`;
 };
 
 /**
@@ -164,9 +152,9 @@ export const API = {
   },
 
   // ============================================
-  // Gateway (only meaningful in production)
+  // Gateway Health
   // ============================================
   gateway: {
-    health: () => isDevelopment ? null : '/health',
+    health: () => `${API_GATEWAY_URL}/health`,
   },
 };
