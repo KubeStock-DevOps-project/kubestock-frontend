@@ -27,13 +27,13 @@ export const inventoryService = {
 
   // Stock Adjustments
   adjustStock: async (adjustmentData) => {
-    const response = await inventoryApi.post(API_ENDPOINTS.INVENTORY.ADJUST, adjustmentData);
+    const response = await inventoryApi.post(`${API_ENDPOINTS.INVENTORY.BASE}/adjust`, adjustmentData);
     return response.data;
   },
 
   // Stock Movements
   getStockMovements: async (params) => {
-    const response = await inventoryApi.get(API_ENDPOINTS.INVENTORY.MOVEMENTS, { params });
+    const response = await inventoryApi.get(`${API_ENDPOINTS.INVENTORY.BASE}/movements`, { params });
     return response.data;
   },
 
@@ -50,18 +50,29 @@ export const inventoryService = {
 
   // Alerts
   getLowStockAlerts: async () => {
-    const response = await inventoryApi.get("/api/alerts");
+    const response = await inventoryApi.get(API_ENDPOINTS.INVENTORY.ALERTS);
     return response.data;
   },
 
   acknowledgeAlert: async (id) => {
-    const response = await inventoryApi.post(`/api/alerts/${id}/acknowledge`);
+    const response = await inventoryApi.post(`${API_ENDPOINTS.INVENTORY.ALERTS}/${id}/acknowledge`);
+    return response.data;
+  },
+
+  getReorderSuggestions: async () => {
+    const response = await inventoryApi.get(`${API_ENDPOINTS.INVENTORY.ALERTS}/reorder-suggestions`);
     return response.data;
   },
 
   // Bulk operations
   bulkCheckAvailability: async (items) => {
-    const response = await inventoryApi.post("/api/inventory/bulk-check", { items });
+    const response = await inventoryApi.post(API_ENDPOINTS.INVENTORY.BULK_CHECK, { items });
+    return response.data;
+  },
+
+  // Analytics
+  getAnalytics: async () => {
+    const response = await inventoryApi.get(API_ENDPOINTS.INVENTORY.ANALYTICS);
     return response.data;
   },
 };

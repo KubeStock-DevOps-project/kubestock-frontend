@@ -6,39 +6,39 @@ const orderApi = createApiClient(SERVICES.ORDER);
 export const orderService = {
   // Orders
   getAllOrders: async (params) => {
-    const response = await orderApi.get(API_ENDPOINTS.ORDERS, { params });
+    const response = await orderApi.get(API_ENDPOINTS.ORDER.BASE, { params });
     return response.data;
   },
 
   getOrderById: async (id) => {
-    const response = await orderApi.get(`${API_ENDPOINTS.ORDERS}/${id}`);
+    const response = await orderApi.get(`${API_ENDPOINTS.ORDER.BASE}/${id}`);
     return response.data;
   },
 
   createOrder: async (orderData) => {
-    const response = await orderApi.post(API_ENDPOINTS.ORDERS, orderData);
+    const response = await orderApi.post(API_ENDPOINTS.ORDER.BASE, orderData);
     return response.data;
   },
 
   updateOrderStatus: async (id, status) => {
-    const response = await orderApi.put(`${API_ENDPOINTS.ORDERS}/${id}/status`, { status });
+    const response = await orderApi.put(`${API_ENDPOINTS.ORDER.BASE}/${id}/status`, { status });
     return response.data;
   },
 
   cancelOrder: async (id, reason) => {
-    const response = await orderApi.post(`${API_ENDPOINTS.ORDERS}/${id}/cancel`, { reason });
+    const response = await orderApi.post(`${API_ENDPOINTS.ORDER.BASE}/${id}/cancel`, { reason });
     return response.data;
   },
 
   // Order Items
   getOrderItems: async (orderId) => {
-    const response = await orderApi.get(`${API_ENDPOINTS.ORDERS}/${orderId}/items`);
+    const response = await orderApi.get(`${API_ENDPOINTS.ORDER.BASE}/${orderId}/items`);
     return response.data;
   },
 
   // Order Statistics
   getOrderStats: async () => {
-    const response = await orderApi.get(`${API_ENDPOINTS.ORDERS}/stats`);
+    const response = await orderApi.get(`${API_ENDPOINTS.ORDER.BASE}/stats`);
     return response.data;
   },
 };

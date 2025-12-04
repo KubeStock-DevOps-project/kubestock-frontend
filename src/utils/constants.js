@@ -1,40 +1,52 @@
+// API Endpoints with consistent service prefixes
+// Each service has a common prefix for simplified gateway routing:
+// - Product Service: /api/product/*
+// - Inventory Service: /api/inventory/*
+// - Supplier Service: /api/supplier/*
+// - Order Service: /api/order/*
+// - Identity Service: /api/identity/*
+
 export const API_ENDPOINTS = {
-  // Note: User authentication is handled by Asgardeo
-  // No local auth endpoints needed
-
-  // Product Catalog Service
-  PRODUCTS: {
-    BASE: "/api/products",
-    SEARCH: "/api/products/search",
-    BY_IDS: "/api/products/by-ids",
+  // Product Catalog Service - /api/product/*
+  PRODUCT: {
+    BASE: "/api/product",
+    CATEGORIES: "/api/product/categories",
+    PRICING: "/api/product/pricing",
+    LIFECYCLE: "/api/product/lifecycle",
   },
-  CATEGORIES: "/api/categories",
 
-  // Inventory Service
+  // Inventory Service - /api/inventory/*
   INVENTORY: {
     BASE: "/api/inventory",
-    ADJUST: "/api/inventory/adjust",
+    ALERTS: "/api/inventory/alerts",
     RESERVE: "/api/inventory/reserve",
     RELEASE: "/api/inventory/release",
-    MOVEMENTS: "/api/inventory/movements",
+    BULK_CHECK: "/api/inventory/bulk-check",
+    ANALYTICS: "/api/inventory/analytics",
   },
 
-  // Supplier Service
-  SUPPLIERS: "/api/suppliers",
-  PURCHASE_ORDERS: "/api/purchase-orders",
+  // Supplier Service - /api/supplier/*
+  SUPPLIER: {
+    BASE: "/api/supplier",
+    RATINGS: "/api/supplier/ratings",
+    PURCHASE_ORDERS: "/api/supplier/purchase-orders",
+  },
 
-  // Order Service
-  ORDERS: "/api/orders",
+  // Order Service - /api/order/*
+  ORDER: {
+    BASE: "/api/order",
+  },
 
-  // Identity Service (Asgardeo SCIM2 Proxy)
+  // Identity Service - /api/identity/*
   IDENTITY: {
+    BASE: "/api/identity",
     SUPPLIERS: "/api/identity/suppliers",
     STAFF: "/api/identity/staff",
     USERS: "/api/identity/users",
     GROUPS: "/api/identity/groups",
   },
 
-  // Health Checks
+  // Health Checks (each service has /health endpoint)
   HEALTH: {
     PRODUCT: "/health",
     INVENTORY: "/health",
