@@ -1,10 +1,10 @@
 import axios from "axios";
-import { SERVICES } from "../utils/constants";
+import { API_ENDPOINTS } from "../utils/constants";
 
 export const healthService = {
   checkProductService: async () => {
     try {
-      const response = await axios.get(`${SERVICES.PRODUCT}/health`, {
+      const response = await axios.get(API_ENDPOINTS.PRODUCT.HEALTH, {
         timeout: 5000,
       });
       return {
@@ -23,7 +23,7 @@ export const healthService = {
 
   checkInventoryService: async () => {
     try {
-      const response = await axios.get(`${SERVICES.INVENTORY}/health`, {
+      const response = await axios.get(API_ENDPOINTS.INVENTORY.HEALTH, {
         timeout: 5000,
       });
       return {
@@ -42,7 +42,7 @@ export const healthService = {
 
   checkSupplierService: async () => {
     try {
-      const response = await axios.get(`${SERVICES.SUPPLIER}/health`, {
+      const response = await axios.get(API_ENDPOINTS.SUPPLIER.HEALTH, {
         timeout: 5000,
       });
       return {
@@ -61,7 +61,7 @@ export const healthService = {
 
   checkOrderService: async () => {
     try {
-      const response = await axios.get(`${SERVICES.ORDER}/health`, {
+      const response = await axios.get(API_ENDPOINTS.ORDER.HEALTH, {
         timeout: 5000,
       });
       return {
@@ -78,12 +78,52 @@ export const healthService = {
     }
   },
 
+  checkIdentityService: async () => {
+    try {
+      const response = await axios.get(API_ENDPOINTS.IDENTITY.HEALTH, {
+        timeout: 5000,
+      });
+      return {
+        status: "healthy",
+        service: "Identity Service",
+        data: response.data,
+      };
+    } catch (error) {
+      return {
+        status: "unhealthy",
+        service: "Identity Service",
+        error: error.message,
+      };
+    }
+  },
+
+  checkGateway: async () => {
+    try {
+      const response = await axios.get(API_ENDPOINTS.GATEWAY.HEALTH, {
+        timeout: 5000,
+      });
+      return {
+        status: "healthy",
+        service: "API Gateway",
+        data: response.data,
+      };
+    } catch (error) {
+      return {
+        status: "unhealthy",
+        service: "API Gateway",
+        error: error.message,
+      };
+    }
+  },
+
   checkAllServices: async () => {
     const results = await Promise.all([
+      healthService.checkGateway(),
       healthService.checkProductService(),
       healthService.checkInventoryService(),
       healthService.checkSupplierService(),
       healthService.checkOrderService(),
+      healthService.checkIdentityService(),
     ]);
     return results;
   },
