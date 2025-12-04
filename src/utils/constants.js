@@ -5,6 +5,9 @@
 // - Supplier Service: /api/supplier/*
 // - Order Service: /api/order/*
 // - Identity Service: /api/identity/*
+//
+// Gateway strips the /api/{service} prefix before forwarding to backends
+// So frontend calls /api/product/health → gateway forwards /health to ms-product
 
 export const API_ENDPOINTS = {
   // Product Catalog Service - /api/product/*
@@ -13,6 +16,7 @@ export const API_ENDPOINTS = {
     CATEGORIES: "/api/product/categories",
     PRICING: "/api/product/pricing",
     LIFECYCLE: "/api/product/lifecycle",
+    HEALTH: "/api/product/health",
   },
 
   // Inventory Service - /api/inventory/*
@@ -23,6 +27,7 @@ export const API_ENDPOINTS = {
     RELEASE: "/api/inventory/release",
     BULK_CHECK: "/api/inventory/bulk-check",
     ANALYTICS: "/api/inventory/analytics",
+    HEALTH: "/api/inventory/health",
   },
 
   // Supplier Service - /api/supplier/*
@@ -30,11 +35,13 @@ export const API_ENDPOINTS = {
     BASE: "/api/supplier",
     RATINGS: "/api/supplier/ratings",
     PURCHASE_ORDERS: "/api/supplier/purchase-orders",
+    HEALTH: "/api/supplier/health",
   },
 
   // Order Service - /api/order/*
   ORDER: {
     BASE: "/api/order",
+    HEALTH: "/api/order/health",
   },
 
   // Identity Service - /api/identity/*
@@ -44,15 +51,12 @@ export const API_ENDPOINTS = {
     STAFF: "/api/identity/staff",
     USERS: "/api/identity/users",
     GROUPS: "/api/identity/groups",
+    HEALTH: "/api/identity/health",
   },
 
-  // Health Checks (each service has /health endpoint)
-  HEALTH: {
-    PRODUCT: "/health",
-    INVENTORY: "/health",
-    SUPPLIER: "/health",
-    ORDER: "/health",
-    IDENTITY: "/health",
+  // Gateway health check
+  GATEWAY: {
+    HEALTH: "/health",
   },
 };
 
